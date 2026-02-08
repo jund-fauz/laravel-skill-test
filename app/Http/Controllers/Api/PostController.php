@@ -16,16 +16,16 @@ class PostController extends Controller
     {
         if ($request->has('page')) {
             $posts = Post::with('user')
-                ->skip(20 * ($request->page - 1))
-                ->take(20)
+                ->orderBy('published_at', 'desc')
+                ->paginate(20, ['*'], 'page', $request->page)
                 ->where('is_draft', '=', 0)
                 ->where('published_at', '<', now())
-                ->get();
+                ->toArray();
         } else {
             $posts = Post::with('user')
-                    ->limit(20)
-                    ->where('is_draft', '=', 0)
-                    ->where('published_at', '<', now())->get();
+                ->limit(20)
+                ->where('is_draft', '=', 0)
+                ->where('published_at', '<', now())->get();
         }
 
         return (new PostResource($posts))
@@ -58,7 +58,7 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
-        if ($post->is_draft == 1 || $post->published_at > now()) {
+        if ($post->is_draft || $post->published_at > now()) {
             return response()->json(['message' => 'Post not found.'], 404);
         }
 
@@ -73,7 +73,7 @@ class PostController extends Controller
     public function update(Request $request, Post $post)
     {
         if ($post->user_id != auth()->id()) {
-            return response()->json(['message' => "You cannot edit other person's post"], 401);
+            return response()->json(['message' => "You cannot edit other person's post"], 403);
         }
 
         $validated = $request->validate([
@@ -96,7 +96,7 @@ class PostController extends Controller
     public function destroy(Post $post)
     {
         if ($post->user_id != auth()->id()) {
-            return response()->json(['message' => "You cannot delete other person's post"], 401);
+            return response()->json(['message' => "You cannot delete other person's post"], 403);
         }
 
         $post->delete();
@@ -104,13 +104,21 @@ class PostController extends Controller
         return response()->json(['message' => 'Post deleted successfully'], 200);
     }
 
-    public function create()
+    public function create(Post $post)
     {
+        if ($post->user_id != auth()->id()) {
+            return response()->json(['message' => "You cannot edit other person's post"], 403);
+        }
+
         return 'posts.create';
     }
 
-    public function edit()
+    public function edit(Post $post)
     {
+        if ($post->user_id != auth()->id()) {
+            return response()->json(['message' => "You cannot delete other person's post"], 403);
+        }
+
         return 'posts.edit';
     }
 }

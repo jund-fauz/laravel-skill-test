@@ -11,7 +11,7 @@ class Post extends Model
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory;
 
-    protected $fillable = ['user_id', 'title', 'content', 'published_at'];
+    protected $fillable = ['user_id', 'title', 'content', 'published_at', 'is_draft'];
 
     public function user(): BelongsTo
     {
