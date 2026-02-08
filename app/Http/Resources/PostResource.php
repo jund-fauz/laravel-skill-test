@@ -14,6 +14,15 @@ class PostResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return $this->resource;
+        $resource = $this->resource;
+        $isArray = is_array($resource);
+
+        return [
+            'id' => $isArray ? ($resource['id'] ?? null) : $resource->id,
+            'title' => $isArray ? ($resource['title'] ?? null) : $resource->title,
+            'content' => $isArray ? ($resource['content'] ?? null) : $resource->content,
+            'published_at' => $isArray ? ($resource['published_at'] ?? null) : $resource->published_at,
+            'user' => $isArray ? ($resource['user'] ?? null) : $this->whenLoaded('user'),
+        ];
     }
 }

@@ -19,8 +19,7 @@ class PostController extends Controller
                 ->orderBy('published_at', 'desc')
                 ->paginate(20, ['*'], 'page', $request->page)
                 ->where('is_draft', '=', 0)
-                ->where('published_at', '<', now())
-                ->toArray();
+                ->where('published_at', '<', now());
         } else {
             $posts = Post::with('user')
                 ->limit(20)
@@ -28,7 +27,7 @@ class PostController extends Controller
                 ->where('published_at', '<', now())->get();
         }
 
-        return (new PostResource($posts))
+        return PostResource::collection($posts)
             ->additional(['message' => 'Posts retrieved successfully.'])
             ->response();
     }
