@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Post extends Model
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<\Database\Factories\PostFactory> */
     use HasFactory;
 
     protected $fillable = ['user_id', 'title', 'content', 'published_at', 'is_draft'];
